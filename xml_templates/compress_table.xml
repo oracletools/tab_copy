@@ -1,0 +1,28 @@
+<worker name="COMPRESS_TABLE">
+  <exec_select>
+    <table_utils   method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value="%%"></param>
+		<param name="SCHEMA_NAME" value=""></param>
+		<param name="TABLE_NAME" value=""/>
+		<param name="IF_SHOW_SERVEROUTPUT" value="1"></param>
+      <sql_template>
+        <![CDATA[
+set serveroutput on echo on termout on line 200
+select  'before' status, owner, table_name, compression ,   compress_for
+from all_tables c
+where  table_name ='%TABLE_NAME%' and owner='%SCHEMA_NAME%'
+/
+
+alter table %SCHEMA_NAME%.%TABLE_NAME% compress
+/
+	
+select  'after' status,owner, table_name, compression ,   compress_for
+from all_tables c
+where  table_name ='%TABLE_NAME%' and owner='%SCHEMA_NAME%'
+/
+	
+]]>
+      </sql_template>
+    </table_utils>
+  </exec_select>
+</worker>

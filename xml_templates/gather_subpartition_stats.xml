@@ -1,0 +1,44 @@
+<worker name="GATHER_SUBPARTITION_STATS">
+  <exec_select>
+    <table_utils   method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value="%%"></param>
+		<param name="SCHEMA_NAME" value=""></param>
+		<param name="TABLE_NAME" value=""/>
+		<param name="SUBPARTITION" value=""/>
+		<param name="STATS_METHOD_OPT" value="FOR ALL COLUMNS"/>
+		<param name="STATS_GRANULARITY" value="PARTITION"/>
+		<param name="STATS_DEGREE" value="8"/>
+		<param name="STATS_CASCADE" value="TRUE"/>
+      <sql_template>
+        <![CDATA[
+set serveroutput on echo on termout on
+
+select '%TABLE_NAME%' table_name,  '%SUBPARTITION%' part, '%STATS_METHOD_OPT%' method_opt, '%STATS_GRANULARITY%' "granularity", '%STATS_CASCADE%' "cascade", '%STATS_DEGREE%' "degree" from dual;
+
+begin
+ DBMS_STATS.GATHER_TABLE_STATS(
+  ownname => '%SCHEMA_NAME%',
+  tabname => '%TABLE_NAME%',
+  partname => '%SUBPARTITION%',
+  estimate_percent => 30,
+  method_opt => '%STATS_METHOD_OPT%',
+  granularity => '%STATS_GRANULARITY%',
+  cascade => %STATS_CASCADE%,
+  degree => %STATS_DEGREE%);
+end;
+/
+
+set line 300
+
+SELECT   dfo_number, tq_id, server_Type, MIN (num_rows),
+               MAX (num_rows), COUNT ( * ) dop
+        FROM   v$pq_tqstat
+    GROUP BY   dfo_number, tq_id, server_Type
+    ORDER BY   dfo_number, tq_id, server_type DESC
+/
+	
+]]>
+      </sql_template>
+    </table_utils>
+  </exec_select>
+</worker>

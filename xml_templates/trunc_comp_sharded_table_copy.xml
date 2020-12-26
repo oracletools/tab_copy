@@ -1,0 +1,64 @@
+<etldataflow name="SHARDED_TABLE_COPY"
+			 pipeline_config=''>
+<globals>
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	<param name="FLOW_TYPE" value="SYNC"></param>		  
+	<param name="FIELD_TERMINATOR" value='|'></param>
+	<param name="LINE_TERMINATOR" value="~"></param>
+	<param name="FROM_DB" value="%%"></param>	  
+	<param name="TO_DB" value="%%"></param>
+	
+	<param name="LAME_DUCK" value='0'></param>
+	<param name="ARRAYSIZE" value="100000"></param>
+	<param name="COPYCOMMIT" value="4"></param>
+		<param name="SKIP_INDEX_MAINTENANCE" value="TRUE"></param>
+		<param name="DPL_BINDSIZE" value="100000"></param>
+		<param name="IF_REBUILD_UNUSABLE_INDEXES" value="0"></param>	
+</globals>
+
+<worker name="TABLE_NAME">
+  <exec_dml title="Truncate Table">
+    <sqlp 	method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value=""></param>
+		<param name="SCHEMA_NAME" value=""></param>	
+		<param name="TABLE_NAME" value=""></param>
+      <sql_template>
+        <![CDATA[
+		TRUNCATE TABLE 
+		%SCHEMA_NAME%.%TABLE_NAME%]]>
+      </sql_template>
+    </sqlp>
+  </exec_dml>
+  <exec_dml title="Compress Table">
+    <sqlp 	method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value=""></param>
+		<param name="SCHEMA_NAME" value=""></param>	
+		<param name="TABLE_NAME" value=""></param>
+      <sql_template>
+        <![CDATA[
+		ALTER TABLE 
+		%SCHEMA_NAME%.%TABLE_NAME% 
+		COMPRESS]]>
+      </sql_template>
+    </sqlp>
+  </exec_dml>  
+  <exec_copy title="Sharded Table Copy">
+    <sqlp 	method="%COPY_METHOD%" >
+		<param name="IF_TRUNCATE" value="0"></param>	
+		
+		<param name="NUM_OF_SHARDS" value="6"></param>
+		<param name="IF_DPL_SERIAL" value="0"></param>
+		
+		<param name="TO_SCHEMA" value=""></param>
+		<param name="TO_TABLE" value=""></param>
+      <sql_template>
+        <![CDATA[%TO_SCHEMA%.%TO_TABLE%]]>
+      </sql_template>
+    </sqlp>
+  </exec_copy>
+</worker>
+
+
+</etldataflow>

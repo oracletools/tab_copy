@@ -1,0 +1,1 @@
+c:\python27.2.5\python.exe tc.py

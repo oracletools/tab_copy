@@ -1,0 +1,38 @@
+<etldataflow name="PARTITION_COPY"
+			 pipeline_config=''>
+<globals>
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	<param name="FLOW_TYPE" value="SYNC"></param>	 
+	  
+	<param name="FIELD_TERMINATOR" value='|'></param>
+	<param name="LINE_TERMINATOR" value="~"></param>
+	<param name="FROM_DB" value="%FROM_DB%"></param>	  
+	<param name="TO_DB" value="%TO_DB%"></param>
+	<param name="TO_SCHEMA" value="TO_SCHEMA"></param>
+	<param name="LAME_DUCK" value='0'></param>
+	<param name="ARRAYSIZE" value="100000"></param>
+	<param name="COPYCOMMIT" value="4"></param>
+
+	--use these 2 to ensure index maintenance in DIRECT non-parallel mode load mode
+	<param name="SKIP_INDEX_MAINTENANCE" value="TRUE"></param>
+	<param name="DPL_BINDSIZE" value="100000"></param>
+	--use this to REBUILD unusable indexes.
+	<param name="IF_REBUILD_UNUSABLE_INDEXES" value="0"></param>
+
+</globals>
+
+<worker name="PARTITION_NAME">
+  <exec_copy>
+    <sqlp 	method="%COPY_METHOD%" >
+	  <param name="PARTITION" value=""></param>
+      <sql_template>
+        <![CDATA[SCHEMA.TABLE]]>
+      </sql_template>
+    </sqlp>
+  </exec_copy>
+</worker>
+
+
+</etldataflow>

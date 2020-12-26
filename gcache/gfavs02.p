@@ -1,0 +1,9 @@
+(dp1
+S'4:root/CSMARTREF_SMARTD1'
+p2
+(dp3
+S'CSMARTREF'
+p4
+S'root/ORACLE/DEV.oracle/CSMARTREF_SMARTD1'
+p5
+ss.

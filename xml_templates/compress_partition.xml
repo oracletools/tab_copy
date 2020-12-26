@@ -1,0 +1,29 @@
+<worker name="COMPRESS_PARTITON">
+  <exec_select>
+    <table_utils   method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value="%%"></param>
+		<param name="SCHEMA_NAME" value=""></param>
+		<param name="TABLE_NAME" value=""/>
+		<param name="PARTITION" value=""/>
+		<param name="IF_SHOW_SERVEROUTPUT" value="1"></param>
+      <sql_template>
+        <![CDATA[
+set serveroutput on echo on termout on line 200
+select  'before' status, table_owner table_name, partition_name,compression ,   compress_for
+from all_tab_partitions c
+where  table_name ='%TABLE_NAME%' and table_owner='%SCHEMA_NAME%' and partition_name='%PARTITION%'
+/
+
+alter table %SCHEMA_NAME%.%TABLE_NAME%  MOVE PARTITION %PARTITION% COMPRESS
+/
+
+select  'after' status, table_owner table_name, partition_name,compression ,   compress_for
+from all_tab_partitions c
+where  table_name ='%TABLE_NAME%' and table_owner='%SCHEMA_NAME%' and partition_name='%PARTITION%'
+/
+	
+]]>
+      </sql_template>
+    </table_utils>
+  </exec_select>
+</worker>

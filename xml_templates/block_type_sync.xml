@@ -1,0 +1,13 @@
+<etldataflow name="SYNC"
+			 pipeline_config=''>
+<globals>
+ 
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	  <param name="FLOW_TYPE" value="SYNC"></param>	
+
+</globals>
+<CallBefore status=0 />
+<CallAfter status=0 />
+</etldataflow>

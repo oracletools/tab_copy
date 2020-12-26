@@ -1,0 +1,77 @@
+<etldataflow name="SUBPARTITION_COPY"
+			 pipeline_config=''>
+<globals>
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	<param name="FLOW_TYPE" value="SYNC"></param>		  
+	<param name="FIELD_TERMINATOR" value='|'></param>
+	<param name="LINE_TERMINATOR" value="~"></param>
+	<param name="FROM_DB" value="%%"></param>	  
+	<param name="TO_DB" value="%%"></param>
+	
+	<param name="LAME_DUCK" value='0'></param>
+	<param name="ARRAYSIZE" value="100000"></param>
+	<param name="COPYCOMMIT" value="4"></param>
+		<param name="SKIP_INDEX_MAINTENANCE" value="TRUE"></param>
+		<param name="DPL_BINDSIZE" value="100000"></param>
+		<param name="IF_REBUILD_UNUSABLE_INDEXES" value="0"></param>
+	<param name="IF_SHOW_SERVEROUTPUT" value="1"></param>		
+</globals>
+
+<worker name="SUBPARTITION_NAME">
+  <exec_select title="Truncate Sub-Partition">
+    <table_utils 	method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value=""></param>
+		<param name="SCHEMA_NAME" value=""></param>	
+		<param name="TABLE_NAME" value=""></param>
+		<param name="SUBPARTITION" value=""></param>
+      <sql_template>
+        <![CDATA[
+set serveroutput on echo on termout on line 200		
+ALTER TABLE 
+%SCHEMA_NAME%.%TABLE_NAME%
+TRUNCATE SUBPARTITION %SUBPARTITION%
+/
+]]>
+      </sql_template>
+    </table_utils>
+  </exec_select>
+  <exec_select title="Compress Sub-Partition">
+    <table_utils 	method="%DML_METHOD%" >
+		<param name="DB_CONNECTOR" value=""></param>
+		<param name="SCHEMA_NAME" value=""></param>	
+		<param name="TABLE_NAME" value=""></param>
+		<param name="SUBPARTITION" value=""></param>
+      <sql_template>
+        <![CDATA[
+set serveroutput on echo on termout on line 200
+ALTER TABLE %SCHEMA_NAME%.%TABLE_NAME% 
+MOVE SUBPARTITION %SUBPARTITION%
+COMPRESS FOR ALL OPERATIONS
+/
+]]>
+      </sql_template>
+    </table_utils>
+  </exec_select>  
+  <exec_copy title="Sharded Sub-Partition Copy">
+    <sqlp 	method="%COPY_METHOD%" >
+		<param name="IF_TRUNCATE" value="0"></param>	
+		
+		<param name="NUM_OF_SHARDS" value=""></param>
+		<param name="IF_DPL_SERIAL" value="0"></param>
+		
+		<param name="TO_SCHEMA" value=""></param>
+		<param name="TO_TABLE" value=""></param>
+		<param name="SUBPARTITION" value=""></param>
+      <sql_template>
+        <![CDATA[%TO_SCHEMA%.%TO_TABLE%]]>
+      </sql_template>
+    </sqlp>
+  </exec_copy>
+ 
+  
+</worker>
+
+
+</etldataflow>

@@ -1,0 +1,7 @@
+  <table_utils method="%QUERY_COPY_METHOD%">
+	<param name="TO_TABLE" value=""/>
+	<param name="IF_CREATE_TARGET_TABLE" value="0"/>
+	<sql_template>
+<![CDATA[SELECT * FROM DUAL ]]>          
+	</sql_template>
+  </table_utils>
