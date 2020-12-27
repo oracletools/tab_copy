@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    env='prod'
+    LOG_ROOT="log/"
+	TMPDIR="tmp/"
+	REFS_PATH="refs"
+	binaries_path ="lib" 
+	template_path ="lib/template"
+	test_home ="test/"
+	DEV_EMAIL_TO="alex.buzunov@citi.com"
+	EMAIL_TO="alex.buzunov@citi.com;sz18178@imcnam.ssmb.com;ravi.kumar.lavadi@citi.com"
+	FAILS_EMAIL_TO="alex.buzunov@citi.com;manish.gomber@citi.com;gnanamba1.chavali@citi.com;venkata.rajesh.reddy.kalavakury@citi.com;venkata.rohit.kumar.mangal@citi.com"
+	SQL_LOADER_COPY="sql_echo_loader"
+	FAST_COPY_METHOD="sql_plus_copy" 
+	DQ_EXPLAIN="dq_explain_plan"	
+    />
+
+  <connector>
+        <!--source connector-->
+	<dev  client_type="ORACLE" descr="dev database">
+        <AB_SMARTP1B type1='inline' schema="SZ18178" pword="June1234" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<!-- FAILS 2 MO copy -->
+		<CSMARTBSER_SMARTU1B type1='inline' schema="CSMARTBSER" pword="Mrzorg28" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTBSER_SMARTQ1 type1='inline' schema="CSMARTBSER" pword="Spring16" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		
+		<EVOL_SMARTD1 type1='inline' schema="Esmartvol " pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CVOL_SMARTU1B type1='inline' schema="CSMARTVOL" pword="Paplan19" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		
+		
+        <!--target connectors-->
+        <ESMARTREF_SMARTU1B type1='inline' schema="ESMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+        <CSMARTREF_SMARTU1B type1='inline' schema="CSMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+        <CSMARTREF_SMARTD1 type1='inline' schema="CSMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+        <ESMARTREF_SMARTD1 type1='inline' schema="ESMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+        <CSMARTREF_SMARTQ1 type1='inline' schema="CSMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+        <ESMARTREF_SMARTQ1 type1='inline' schema="ESMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+  </dev>
+  </connector>
+ 
+  <default>
+	  <env>
+		 <fail_2m COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%FAILS_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </fail_2m>	
+		 
+		 <dq_test DQ_TEST_METHOD="%DQ_EXPLAIN%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dq_test>
+		 
+		 <dev COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dev>
+		 
+		 <dev_copy COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dev_copy>
+
+		 <qa COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>	  
+		 </qa>
+
+		 <uat COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>	  
+		 </uat>		 
+		 
+		 <prod COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </prod>	 
+	  </env>
+  </default>
+  <worker>
+	<exec_dml name="sqlp" module_name="sql_utils" />	
+	<exec_copy name="sqlp" module_name="sql_utils" />
+  </worker>
+</app_spec>

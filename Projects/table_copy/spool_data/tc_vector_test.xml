@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Citi. All rights reserved.
+     Author: Alex.Buzunov@citi.com (Alex Buzunov)
+     Python Implementation of ETL pipeline
+-->
+<etldataflow name="nz_spool">
+<globals>
+
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	  <param name="FLOW_TYPE" value="ASYNC"></param>	
+
+	  <param name="FIELD_TERMINATOR" value="|"></param>
+	  <param name="LINE_TERMINATOR" value="''"></param>
+	  
+  
+
+		<param name="FROM_DB" value="%MRRETL_MRRBI%"></param>
+		<param name="FROM_SCHEMA" value="MRR_ETL_USER"></param>
+	  
+	  
+	   <!--will spool ALL records if LAME_DUCK=0-->
+	  <param name="LAME_DUCK" value='0'></param>
+	  <param name="ARRAYSIZE" value="5000"></param>
+	  <param name="COPYCOMMIT" value="4"></param>
+	  <!--sqlp attribute-->
+		
+		
+	  <param name="SOURCE_FILE" value="--replaced from command line"></param>	
+	  <param name="COB_YEAR" value="--replaced from command line"></param>
+
+</globals>
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+Select * from DUAL;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+
+</etldataflow>

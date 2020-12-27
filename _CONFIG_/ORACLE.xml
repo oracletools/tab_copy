@@ -8,7 +8,7 @@
 			<oracle client_type="ORACLE" descr="GMA prod database">
 				
 							
-			<AB95022_SMARTP_B HOST="mwmapwlprd03.nam.nsroot.net" PORT="11150" pword="" schema="AB95022" sid="SMARTP_B" type1="inline"/></oracle>	
+			<AB95022_SMARTP_B HOST="mwmapwlprd03.nam.nsroot.net" PORT="11150" pword="asdasd" schema="AB95022" sid="SMARTP_B" type1="inline"/></oracle>	
 		</PROD>
 		<UAT>
 			<oracle client_type="ORACLE" descr="UAT database">				
@@ -18,7 +18,7 @@
 				
 				
 				     
-			<CSMARTBSER_SMARTU1B HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTBSER" sid="SMARTU1B" type1="inline"/><CSMARTREF_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTREF" sid="SMARTD1" type1="inline"/></oracle>
+			<CSMARTBSER_SMARTU1B HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="asdasd" schema="CSMARTBSER" sid="SMARTU1B" type1="inline"/><CSMARTREF_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTREF" sid="SMARTD1" type1="inline"/></oracle>
 		</UAT>
 
 		<QA>
@@ -31,8 +31,8 @@
 				
 				
 				
-			<ESMARTREF_SMARTQ1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="ESMARTREF" sid="SMARTQ1" type1="inline"/>
-			<CSMARTVOL_SMARTQ1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTVOL" sid="SMARTQ1" type1="inline"/></oracle>
+			<ESMARTREF_SMARTQ1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="Jan11uar" schema="ESMARTREF" sid="SMARTQ1" type1="inline"/>
+			<CSMARTVOL_SMARTQ1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="Tetris25" schema="CSMARTVOL" sid="SMARTQ1" type1="inline"/></oracle>
 		
 		</QA>
 
@@ -59,8 +59,8 @@
 				
 				
 				
-			<CSMARTVOL_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTVOL" sid="SMARTD1" type1="inline"/>
-			<CSMARTREF_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="" schema="CSMARTREF" sid="SMARTD1" type1="inline"/></oracle>
+			<CSMARTVOL_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="spring16" schema="CSMARTVOL" sid="SMARTD1" type1="inline"/>
+			<CSMARTREF_SMARTD1 HOST="mapswdbdn1.nam.nsroot.net" PORT="11150" pword="spring16" schema="CSMARTREF" sid="SMARTD1" type1="inline"/></oracle>
 	
 		
 		</DEV>	

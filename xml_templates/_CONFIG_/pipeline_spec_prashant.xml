@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    env='dev'
+	env2='{$ETL_ENV}'
+    LOG_ROOT="log/"
+	TMPDIR="tmp/"
+	REFS_PATH="refs"
+	binaries_path ="lib" 
+	template_path ="lib/template"
+	test_home ="test/"
+	DEV_EMAIL_TO1="prashant5.sawant@citi.com"
+	DEV_EMAIL_TO="prashant5.sawant@citi.com"
+	EMAIL_TO="prashant5.sawant@citi.com"
+	VOL_EMAIL_TO="prashant5.sawant@citi.com"
+	SQL_LOADER_COPY="sql_echo_loader"
+	FAST_COPY_METHOD="sql_plus_copy"
+	DQ_EXPLAIN="dq_explain_plan"	
+    />
+
+  <connector>
+        <!--source connector-->
+	<dev_test  client_type="ORACLE" descr="dev database">
+        <PS_SMARTP1B type1='inline' schema="PS56255" pword="Feb2012" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+        <!--target connectors-->
+        <CVOL_SMARTQ1 type1='inline' schema="CSMARTVOL" pword="Tetris25" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+        <CVOL_SMARTD1 type1='inline' schema="CSMARTVOL" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+        <CVOL_SMARTU1B type1='inline' schema="CSMARTVOL" pword="Paplan19" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+	</dev_test>
+   </connector>
+ 
+  <default>
+	  <env>
+	  
+		 <vol COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%VOL_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%PS_SMARTP1B%"></param>
+ 		 </vol>
+
+ 		 <dev COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%PS_SMARTP1B%"></param>
+ 		 </dev>
+
+	  </env>
+  </default>
+  <worker>
+    <!--worker name has to be unique -->
+	<exec_dml name="sqlp" module_name="sql_utils" />	
+    <!--worker name has to be unique -->
+	<exec_copy name="sqlp" module_name="sql_utils" />
+  </worker>
+</app_spec>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Citi. All rights reserved.
+     Author: Alex.Buzunov@citi.com (Alex Buzunov)
+     Python Implementation of ETL pipeline
+-->
+<etldataflow name="CORE_TEST_LEVEL_1">
+<globals>
+
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	  <param name="FLOW_TYPE" value="SYNC"></param>	
+
+	  <param name="FIELD_TERMINATOR" value="|"></param>
+	  <param name="LINE_TERMINATOR" value="''"></param>
+	  
+  
+
+		<param name="FROM_DB" value="%MRRETL_MRRBI%"></param>
+		<param name="FROM_SCHEMA" value="MRR_ETL_USER"></param>
+	   <param name="DB_CONNECTOR" value="%MRRETL_MRRBI%"></param>
+	  
+	   <!--will spool ALL records if LAME_DUCK=0-->
+	  <param name="LAME_DUCK" value='0'></param>
+	  <param name="ARRAYSIZE" value="5000"></param>
+	  <param name="COPYCOMMIT" value="4"></param>
+	  <!--sqlp attribute-->
+		
+		
+	  <param name="SOURCE_FILE" value="--replaced from command line"></param>	
+	  <param name="COB_YEAR" value="--replaced from command line"></param>
+
+</globals>
+
+
+<worker name="TMP_INSERT">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+      <sql_template>
+        <![CDATA[ 
+select MRR_BI..SP_GET_MRX_ORH4V_V5(
+'VH~002354',
+'2013/08/01',
+'2013/08/31',
+'**',
+'**',
+'**',
+'**',
+'**',
+'**',
+NULL,
+NULL,
+NULL,
+NULL,
+Null,
+Null,
+Null,
+NULL,
+Null,
+'''''RSKMGR''''',
+'M_VAR_95P_TRD_3Y,M_VAR_95P_TRD_1Y,M_VAR_95P_ECN_1Y,M_VAR_1P_TRD_3Y,M_STRS10_3Y,M_STRS_TRD_VAR',
+NULL,
+'MGMT');
+
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+<worker1 name="CREATE_TAB">
+   <exec_dml>
+   <nztable_utils 	method="%DML_METHOD%" >
+      <sql_template>
+        <![CDATA[
+Create temp table COB_20130903144531 as Select * FROM DUAL;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_dml> 
+</worker1>
+
+
+ 
+
+</etldataflow>

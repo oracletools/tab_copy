@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Citi. All rights reserved.
+     Author: Alex.Buzunov@citi.com (Alex Buzunov)
+     Python Implementation of ETL pipeline
+-->
+<etldataflow name="lines">
+<globals>
+
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	  <param name="FLOW_TYPE" value="ASYNC"></param>	
+
+	  <param name="FIELD_TERMINATOR" value="|"></param>
+	  <param name="LINE_TERMINATOR" value="''"></param>
+	  
+  
+
+		<param name="FROM_DB" value="%MRRETL_MRR%"></param>
+		<param name="FROM_SCHEMA" value="MRR_ETL_USER"></param>
+	  
+	  
+	   <!--will spool ALL records if LAME_DUCK=0-->
+	  <param name="LAME_DUCK" value='0'></param>
+	  <param name="ARRAYSIZE" value="5000"></param>
+	  <param name="COPYCOMMIT" value="4"></param>
+	  <!--sqlp attribute-->
+		
+		
+	  <param name="SOURCE_FILE" value="--replaced from command line"></param>	
+	  <param name="COB_YEAR" value="--replaced from command line"></param>
+
+</globals>
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+
+<worker name="10d_test">
+  <exec_query_spool>
+    <nztable_utils 	method="%QUERY_SPOOL_METHOD%" >
+     	<param name="IF_COMPRESSED_SPOOL" value="0"></param>
+
+      <sql_template>
+        <![CDATA[ 
+select	  a11.COB_DT_ID  COB_DT_ID,		
+	a11.COBDATE,		
+	a11.VCTR_TYP_ID  VCTR_TYP_ID,		
+	'3Y VaR'  LIMIT_VAR_TYP,	max(CLNDR_DT),	avg(PL_VAL),
+	--round(udf_cpp_apply_Method(uda_cpp_get_Vector( to_char(a12.CLNDR_DT,'YYMMDD'), round(a11.PL_VAL,2),null,null),780, '3Y_ESF'),2)  LIMIT_VAR,		
+	CURRENT_TIMESTAMP  TS_BEGIN,		
+	'3000-01-01 00:00:00'  TS_END		
+from	--DL_D_VCTR_DTL_1D	
+        (SELECT COB_DT_ID,CLNDR_DT,VCTR_TYP_ID,GRAIN_ID,RSK_GRP_ID,COBDATE,PL_VAL FROM tmp_VCTR_DTL_AB) 	 a11
+	join	DL_D_RSK_GRP_VW	a14
+	  on 	(a11.RSK_GRP_ID = a14.RSK_GRP_ID)	
+	join	--DL_F_GRAIN_VW	
+            (SELECT GRAIN_ID,BKMAP_ID FROM MV_DL_F_GRAIN_AB --DL_F_GRAIN_AB
+            ) a15
+	  on 	(a11.GRAIN_ID = a15.GRAIN_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL ACT 
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in ('ACT') and 		
+(			
+   ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a16		
+	  on 	(a15.BKMAP_ID = a16.BKMAP_ID)	
+	join	(select	BKMAP_ID, BKMAP_ATTR_VAL BP_LVL
+from	--DL_D_BKMAP_ATTR	
+        DL_D_BKMAP_ATTR_AB a	
+where	a.BKMAP_ATTR_NM in 		
+('MRR_BP_LVL01','MRR_BP_LVL02','MRR_BP_LVL03','MRR_BP_LVL04','MRR_BP_LVL05','MRR_BP_LVL06','MRR_BP_LVL07','MRR_BP_LVL08','MRR_BP_LVL09','MRR_BP_LVL10','MRR_BP_LVL11','MRR_BP_LVL12','MRR_BP_LVL13')			
+and 			
+(			
+ ((A.CRRNT_FLG = 1) AND ((NOW() >= A.EFFTV_DT) AND (NOW() <= A.END_DT)))			
+   AND ((			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS') 			
+>= A.COB_STRT_DT) AND (			
+(select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+<= A.COB_END_DT))			
+))	a17		
+	  on 	(a15.BKMAP_ID = a17.BKMAP_ID)	
+	join	--DL_FLAT_BKMAP_VW
+            (SELECT GM_9_ID,GM_9_SID FROM DL_FLAT_BKMAP_VW_AB) a18
+	  on 	(a15.BKMAP_ID = a18.GM_9_ID)	
+	join	--DL_D_ENTITY_HIER_NODE_LKUP
+            (SELECT COBDATE,PARNT_ID,HIER_NM,CHILD_ID,PARENT_LVL FROM DL_D_ENTITY_HIER_NODE_LKUP_AB) a19
+	  on 	(a18.GM_9_SID = a19.CHILD_ID)	
+	join	DL_D_VCTR_TYP_VW	a110
+	  on 	(a11.VCTR_TYP_ID = a110.VCTR_TYP_ID)	
+	--join	--DL_D_CLNDR
+       --     (SELECT CLNDR_DT,CLNDR_ID FROM  DL_D_CLNDR_AB) a111
+	  --on 	(a13.COB_DT_ID = a111.CLNDR_ID)	
+where	((a19.PARNT_ID = 8009174 and a19.HIER_NM = 'VH~002354' and a19.PARENT_LVL = 1)		
+ and a110.VCTR_TYP_NM in ('Management')			
+ and a16.ACT in ('MTM')			
+ and a17.BP_LVL in ('Banc of America Securities Limited')			
+ and a14.RSK_GRP_NM in ('Ir (total)')			
+ and a110.CRRNT_FLG in (1)			
+ and a110.FD_SRC_ID in (1)			
+ --and sgnoff_flg = 1			
+ and a19.HIER_NM in ('VH~002354')			
+ and a19.COBDATE in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS')			
+ and DATE(a11.CLNDR_DT) in (select trim(nvl(PARAM_VAL,(SELECT PARAM_VAL FROM MRR_STG..BATCH_PARAM WHERE PARAM_NAME = 'MRS_COB_DATE' )))  from MRR_STG..batch_param where PARAM_NAME = 'COBDATE_OVERIDE' and process_name = 'LIMITS_BATCH' and sub_process_name = 'BATCH_OVERIDE_PARAMS'))			
+group by	a11.COB_DT_ID,	a11.COBDATE,	
+	a11.VCTR_TYP_ID;
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_query_spool>
+</worker>
+
+</etldataflow>

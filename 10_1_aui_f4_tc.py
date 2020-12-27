@@ -1652,7 +1652,7 @@ import wx.lib.agw.aui as aui
 
 #SomeNewEvent, EVT_SOME_NEW_EVENT = wx.lib.newevent.NewEvent()
 #SomeNewCommandEvent, EVT_SOME_NEW_COMMAND_EVENT = wx.lib.newevent.NewCommandEvent()
-from wx.lib.pubsub import Publisher
+from wx.lib.pubsub import pub
 
 
 class SQLPanel(wx.Panel):

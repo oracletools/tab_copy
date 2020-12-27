@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Citi. All rights reserved.
+     Author: Alex.Buzunov@citi.com (Alex Buzunov)
+     Python Implementation of ETL pipeline
+-->
+<etldataflow name="CORE_TEST_LEVEL_1">
+<globals>
+
+	<!-- PIPELINE execution type
+		 SYNC - synchronous, ANYNC - asynchronous 
+	-->
+	  <param name="FLOW_TYPE" value="ASYNC"></param>	
+
+	  <param name="FIELD_TERMINATOR" value="|"></param>
+	  <param name="LINE_TERMINATOR" value="''"></param>
+	  
+  
+
+		<param name="FROM_DB" value="%MRRETL_MRRBI%"></param>
+		<param name="FROM_SCHEMA" value="MRR_ETL_USER"></param>
+	   <param name="DB_CONNECTOR" value="%MRRETL_MRRBI%"></param>
+	  
+	   <!--will spool ALL records if LAME_DUCK=0-->
+	  <param name="LAME_DUCK" value='0'></param>
+	  <param name="ARRAYSIZE" value="5000"></param>
+	  <param name="COPYCOMMIT" value="4"></param>
+	  <!--sqlp attribute-->
+		
+		
+	  <param name="SOURCE_FILE" value="--replaced from command line"></param>	
+	  <param name="COB_YEAR" value="--replaced from command line"></param>
+
+</globals>
+
+
+
+<worker name="T_11">
+   <exec_dml>
+    <nztable_utils 	method="%DML_METHOD%" >
+      <sql_template>
+        <![CDATA[
+INSERT INTO DL_F_MGMT_VCTR_RNK_CB_5s  select cb.*   
+from  DL_F_MGMT_VCTR_RNK_CB cb
+	join MRR..DL_D_CLNDR cob
+		on (cob.clndr_id = cb.cob_dt_id
+		and cob.clndr_dt  between to_date('2013/08/01','YYYY-MM-DD') and to_date('2013/08/31','YYYY-MM-DD'));
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_dml> 
+</worker>
+
+<worker1 name="T_12">
+   <exec_dml>
+   <nztable_utils 	method="%DML_METHOD%" >
+      <sql_template>
+        <![CDATA[
+INSERT INTO DL_F_MGMT_VCTR_RNK_CB_5s_2  select cb.*   
+from  DL_F_MGMT_VCTR_RNK_CB cb
+	join MRR..DL_D_CLNDR cob
+		on (cob.clndr_id = cb.cob_dt_id
+		and cob.clndr_dt  between to_date('2013/08/12','YYYY-MM-DD') and to_date('2013/08/13','YYYY-MM-DD'));
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_dml> 
+</worker1>
+
+<worker1 name="T_13">
+   <exec_dml>
+   <nztable_utils 	method="%DML_METHOD%" >
+      <sql_template>
+        <![CDATA[
+INSERT INTO DL_F_MGMT_VCTR_RNK_CB_5s_3  select cb.*   
+from  DL_F_MGMT_VCTR_RNK_CB cb
+	join MRR..DL_D_CLNDR cob
+		on (cob.clndr_id = cb.cob_dt_id
+		and cob.clndr_dt  between to_date('2013/08/13','YYYY-MM-DD') and to_date('2013/08/14','YYYY-MM-DD'));
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_dml> 
+</worker1>
+
+<worker1 name="T_14">
+   <exec_dml>
+   <nztable_utils 	method="%DML_METHOD%" >
+      <sql_template>
+        <![CDATA[
+INSERT INTO DL_F_MGMT_VCTR_RNK_CB_5s_4  select cb.*   
+from  DL_F_MGMT_VCTR_RNK_CB cb
+	join MRR..DL_D_CLNDR cob
+		on (cob.clndr_id = cb.cob_dt_id
+		and cob.clndr_dt  between to_date('2013/08/14','YYYY-MM-DD') and to_date('2013/08/15','YYYY-MM-DD'));
+]]>
+      </sql_template>
+    </nztable_utils>
+  </exec_dml> 
+</worker1>
+
+
+</etldataflow>

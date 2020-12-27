@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    env='dev'
+	env2='{$ETL_ENV}'
+    LOG_ROOT="/tmp/gctest/log/"
+	TMPDIR="/tmp/gctest/"
+	REFS_PATH="refs"
+	binaries_path ="lib" 
+	template_path ="lib/template"
+	test_home ="test/"
+	DEV_EMAIL_TO1="ab95022@imcnam.ssmb.com"
+	DEV_EMAIL_TO="alex.buzunov@citi.com;sl46566@imcnam.ssmb.com;suryanarayan.kuanar@citi.com"
+
+	EMAIL_TO="alex.buzunov@citi.com;sz18178@imcnam.ssmb.com;ravi.kumar.lavadi@citi.com"
+	VOL_EMAIL_TO="alex.buzunov@citi.com;manish.gomber@citi.com;gnanamba1.chavali@citi.com;venkata.rajesh.reddy.kalavakury@citi.com;venkata.rohit.kumar.mangal@citi.com"
+
+	SQL_LOADER_COPY="copy_table"
+	FAST_COPY_METHOD="sql_plus_copy"
+	DQ_EXPLAIN="dq_explain_plan"
+	SPOOL_TEST="spool"
+	SHARDED_SQL_LOADER_COPY="sharded_load"
+	
+	SELECT ="select"	
+	DML ="dml"
+	DDL_SPOOL_TEST="spool_ddl"
+	DDL_PUBLISH_TEST="publish_ddl"
+
+	CLONE_TABLE="clone_table"
+	
+	SAFE_TABLE_COPY="safe_copy"    
+	SPOOL_QUERY="spool_query_data"
+	COPY_QUERY="copy_query_data"
+
+/>
+
+  <connector>
+        <!--source connector-->
+		
+		<prod_nz client_type="NETEZZA" descr="market risk db">
+			<DL_GMAC1B type1='inline' schema="DLROGMARWSMART" pword="Pipacs09" sid="GMAC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<BK_SMARTP1B type1='inline' schema="BK94994" pword="April2013" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<AB_SMARTP1B type1='inline' schema="AB95022" pword="citi500" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>			
+			<ZZ_SMARTP1B type1='inline' schema="AB95022" pword="citi500" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>			
+			<AD_SMARTC1B type1='inline' schema="AD45676" pword="India2211" sid="SMARTC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<SY_SMARTC1B type1='inline' schema="SY25573" pword="julpass74" sid="SMARTC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		</prod_nz>
+		
+		<prod client_type="ORACLE" descr="GMA prod database">
+			<DL_GMAC1B type1='inline' schema="DLROGMARWSMART" pword="Pipacs09" sid="GMAC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<BK_SMARTP1B type1='inline' schema="BK94994" pword="April2013" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<AB_SMARTP1B type1='inline' schema="AB95022" pword="citi500" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>			
+			<ZZ_SMARTP1B type1='inline' schema="AB95022" pword="citi500" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>			
+			<AD_SMARTC1B type1='inline' schema="AD45676" pword="India2211" sid="SMARTC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<SY_SMARTC1B type1='inline' schema="SY25573" pword="julpass74" sid="SMARTC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		</prod>	
+		
+		<uat_oracle client_type="ORACLE" descr="UAT database">				
+			<!-- FAILS 2 MO copy -->
+			<CSMARTBSER_SMARTU1B type1='inline' schema="CSMARTBSER" pword="Mrzorg28" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<CSMARTBSER_SMARTQ1 type1='inline' schema="CSMARTBSER" pword="Spring16" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<CVOL_SMARTQ1 type1='inline' schema="CSMARTVOL" pword="Tetris25" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<CVOL_SMARTD1 type1='inline' schema="CSMARTVOL" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		</uat_oracle>
+		
+		<qa client_type="NETEZZA" descr="test database">
+			<EVOL_SMARTD1 type1='inline' schema="Esmartvol " pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<CVOL_SMARTU1B type1='inline' schema="CSMARTVOL" pword="Paplan19" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<COTD_SMARTU1B type1='inline' schema="CSMARTOTD" pword="w7FbQS" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<COTD_SMARTQ1 type1='inline' schema="CSMARTOTD" pword="Q8EUl3" sid="SMARTQ1" HOST = "mapswdbdn1-vip.nam.nsroot.net"  PORT = "11150"/>
+		</qa >
+		
+		<dev client_type="ORACLE" descr="development db">
+			<ESMARTABC_SMARTU1B type1='inline' schema="ESMARTABC" pword="Tetris25" sid="SMARTU1B" HOST = "mapswdbun1-vip.nam.nsroot.net" PORT = "11150"/>
+			<!--target connectors-->
+			<ESMARTABC_SMARTD1 type1='inline' schema="ESMARTABC" pword="Paplan75" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net" PORT = "11150"/>
+			<ESMARTREF_SMARTU1B type1='inline' schema="ESMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<CSMARTREF_SMARTU1B type1='inline' schema="CSMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<CSMARTREF_SMARTD1 type1='inline' schema="CSMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<ESMARTREF_SMARTD1 type1='inline' schema="ESMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<CSMARTREF_SMARTQ1 type1='inline' schema="CSMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<ESMARTREF_SMARTQ1 type1='inline' schema="ESMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<SMARTD1 type1='inline' schema="CSMARTVOL" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+			<ST_SMARTC1B type1='inline' schema="ST60608" pword="STjul2013" sid="SMARTC1B" HOST = "mapswdbcn1-vip.nam.nsroot.net"  PORT = "11150"/>
+			<SA_SMARTC1B type1='inline' schema="SA95421" pword="M.Saicharan5" sid="SMARTC1B" HOST = "mapswdbcn1-vip.nam.nsroot.net"  PORT = "11150"/>
+			<EVOL_SMARTU1B type1='inline' schema="ESMARTVOL" pword="Kecske57" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+			<EVOL_SMARTQ1 type1='inline' schema="ESMARTVOL" pword="Kecske65" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		</dev>
+		
+		<dev_nz client_type="NETEZZA" descr="development Netezza database">
+			<ETL_MRR_BI  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>
+
+		</dev_nz>
+		<dev_nz2 client_type="NETEZZA" descr="development Netezza database">
+			<ETL_MRR_BI  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>
+			<ETL_MRR_BI_1  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR_1  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>
+			<ETL_MRR_BI_2  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR_2  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>			
+		</dev_nz2>		
+		
+		<test client_type="NETEZZA" descr="development Netezza database">
+			<ETL_MRR_BI  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>
+			<ETL_MRR_BI_1  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR_1  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>
+			<ETL_MRR_BI_2  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR_BI" HOST = "" PORT = ""/>
+			<ETL_MRR_2  schema="MRR_ETL_USER" pword="Nynj2011" sid="MRR" HOST = "" PORT = ""/>			
+		</test>		
+				
+		
+</connector>
+ 
+  <default>
+
+        <env>
+	      <vol_spool SPOOL_METHOD="%SQL_SPOOL%">
+		  <param name="EMAIL_TO" value='%VOL_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 		</vol_spool>
+		 <dev 	COPY_METHOD="%SQL_LOADER_COPY%" 
+				SPOOL_METHOD="%SPOOL_TEST%"
+				CLONE_TABLE="%CLONE_TABLE%"
+				DML_METHOD="%DML%"
+				SELECT_METHOD="%SELECT%"
+				DDL_SPOOL_METHOD="%DDL_SPOOL_TEST%"
+				PUBLISH_DDL="%DDL_PUBLISH_TEST%"
+				QUERY_COPY_METHOD="%COPY_QUERY%"
+				QUERY_SPOOL_METHOD="%SPOOL_QUERY%"
+					>
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO1%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dev>
+
+        <dev0 COPY_METHOD="%SQL_LOADER_COPY%"  SPOOL_METHOD="%SQL_SPOOL%">
+		  <param name="EMAIL_TO" value='%VOL_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 		</dev0>
+	 </env>
+
+  </default>
+  <worker>
+  <!--worker name has to be unique -->
+	<exec_dml name="sqlp" module_name="sql_utils" />	
+    <!--worker name has to be unique -->
+	<exec_copy name="sqlp" module_name="sql_utils" />
+		
+	<exec_sharded_copy name="sqlp" module_name="sql_utils" />
+	<exec_spool_ddl name="sqlp" module_name="sql_utils" />
+	<publisher name="sqlp" module_name="sql_utils" />
+	<exec_select1 name="sqlp" module_name="sql_utils" />	
+	<exec_clone_table name="table_utils" module_name="table_utils" />	
+	<exec_safe_copy name="table_utils" module_name="table_utils" />	
+	<exec_ddl name="table_utils" module_name="table_utils" />	
+	<exec_copy1 name="table_utils" module_name="table_utils" />
+	<exec_select name="table_utils" module_name="table_utils" />
+	<exec_spool name="table_utils" module_name="table_utils" />
+	<exec_query_spool name="table_utils" module_name="table_utils" />
+	<exec_query_copy name="table_utils" module_name="table_utils" />
+  </worker>
+</app_spec>

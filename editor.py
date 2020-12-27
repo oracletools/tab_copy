@@ -1,4 +1,5 @@
 import wx
+
 try:
 	##raise ImportError     # for testing the alternate implementation
 	from wx import stc
@@ -203,36 +204,7 @@ try:
 
 
 except ImportError:
-	raise
-	if 0:
-		class TacoCodeEditor(wx.TextCtrl):
-			def __init__(self, parent):
-				wx.TextCtrl.__init__(self, parent, -1, style =
-									 wx.TE_MULTILINE | wx.HSCROLL | wx.TE_RICH2 | wx.TE_NOHIDESEL)
-
-			def RegisterModifiedEvent(self, eventHandler):
-				self.Bind(wx.EVT_TEXT, eventHandler)
-
-			def SetReadOnly(self, flag):
-				self.SetEditable(not flag)
-				# NOTE: STC already has this method
-		
-			def GetText(self):
-				return self.GetValue()
-
-			def GetPositionFromLine(self, line):
-				return self.XYToPosition(0,line)
-
-			def GotoLine(self, line):
-				pos = self.GetPositionFromLine(line)
-				self.SetInsertionPoint(pos)
-				self.ShowPosition(pos)
-
-			def SelectLine(self, line):
-				start = self.GetPositionFromLine(line)
-				end = start + self.GetLineLength(line)
-				self.SetSelection(start, end)
-				
+	raise				
 try:
 	##raise ImportError     # for testing the alternate implementation
 	from wx import stc
@@ -323,14 +295,16 @@ try:
 			# Set up the numbers in the margin for margin #1
 			self.SetMarginType(1, wx.stc.STC_MARGIN_NUMBER)
 			# Reasonable value for, say, 4-5 digits using a mono font (40 pix)
-			self.SetMarginWidth(1, 40)
+			self.SetMarginWidth(1, 20)
+			self.SetMarginWidth(2, 5)
+			#self.SetMarginLeft(10)
 	
 			# Indentation and tab stuff
-			self.SetIndent(4)               # Proscribed indent size for wx
+			self.SetIndent(1)               # Proscribed indent size for wx
 			self.SetIndentationGuides(True) # Show indent guides
 			self.SetBackSpaceUnIndents(True)# Backspace unindents rather than delete 1 space
 			self.SetTabIndents(True)        # Tab key indents
-			self.SetTabWidth(4)             # Proscribed tab size for wx
+			self.SetTabWidth(1)             # Proscribed tab size for wx
 			self.SetUseTabs(False)          # Use spaces rather than tabs, or
 											# TabTimmy will complain!    
 			# White space
@@ -343,13 +317,13 @@ try:
 			self.SetViewEOL(False)
 			
 			# No right-edge mode indicator
-			self.SetEdgeMode(stc.STC_EDGE_NONE)
+			#self.SetEdgeMode(stc.STC_EDGE_NONE)
 	
 			# Setup a margin to hold fold markers
-			self.SetMarginType(2, stc.STC_MARGIN_SYMBOL)
-			self.SetMarginMask(2, stc.STC_MASK_FOLDERS)
-			self.SetMarginSensitive(2, True)
-			self.SetMarginWidth(2, 12)
+			#self.SetMarginType(3, stc.STC_MARGIN_SYMBOL)
+			#self.SetMarginMask(1, stc.STC_MASK_FOLDERS)
+			#self.SetMarginSensitive(2, True)
+			#self.SetMarginWidth(2, 12)
 	
 			# and now set up the fold markers
 			self.MarkerDefine(stc.STC_MARKNUM_FOLDEREND,     stc.STC_MARK_BOXPLUSCONNECTED,  "white", "black")

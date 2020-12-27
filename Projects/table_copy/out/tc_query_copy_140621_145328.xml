@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<etldataflow name="QUERY_COPY_OWNER_2.TABLE_0.QUERY" node_type="etldataflow" pipeline_config="pipeline_config_140621_145328.xml">
+  <globals>
+    <param name="FLOW_TYPE" node_type="param" value="ASYNC"/>
+    <param name="FIELD_TERMINATOR" node_type="param" value="`|"/>
+    <param name="LINE_TERMINATOR" node_type="param" value="~"/>
+    <param name="FROM_DB" node_type="param" value="CSMARTREF_SMARTD1"/>
+    <param name="FROM_SCHEMA" node_type="param" value="OWNER_2"/>
+    <param name="TO_DB" node_type="param" value="CSMARTVOL_SMARTQ1"/>
+    <param name="TO_SCHEMA" node_type="param" value="OWNER_3"/>
+    <param name="LAME_DUCK" node_type="param" value="0"/>
+    <param name="ARRAYSIZE" node_type="param" value="5000"/>
+    <param name="COPYCOMMIT" node_type="param" value="4"/>
+    <param name="IF_TRUNCATE" node_type="param" value="0"/>
+    <param name="IF_SHOW_SERVEROUTPUT" node_type="param" value="1"/>
+  </globals>
+  <worker name="OWNER_2.TABLE_0.QUERY" node_type="worker">
+    <exec_query_copy>
+      <table_utils method="%QUERY_COPY_METHOD%">
+        <param name="TO_TABLE" node_type="param" value="TABLE_0"/>
+        <param name="TO_SCHEMA" node_type="param" value="OWNER_2"/>
+        <param name="IF_CREATE_TARGET_TABLE" node_type="param" value="1"/>
+      </table_utils>
+    </exec_query_copy>
+  </worker>
+</etldataflow>

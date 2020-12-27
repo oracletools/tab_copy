@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    env='dev'
+	env2='{$ETL_ENV}' 
+    LOG_ROOT="log/"
+	TMPDIR="tmp/"
+	REFS_PATH="refs"
+	binaries_path ="lib" 
+	template_path ="lib/template"
+	test_home ="test/"
+	DEV_EMAIL_TO="alex.buzunov@citi.com"
+	EMAIL_TO="alex.buzunov@citi.com;dl.gt.global.smart.ref.data.tech@imcnam.ssmb.com"
+	FAILS_EMAIL_TO="alex.buzunov@citi.com;manish.gomber@citi.com;venkata.rajesh.reddy.kalavakury@citi.com"
+	SQL_LOADER_COPY="copy_table"
+	FAST_COPY_METHOD="sql_plus_copy"
+	DQ_EXPLAIN="dq_explain_plan"
+	SPOOL_TEST="spool"
+	SHARDED_SQL_LOADER_COPY="sharded_load"
+	
+	SELECT ="select"	
+	DML ="dml"
+	DDL_SPOOL_TEST="spool_ddl"
+	DDL_PUBLISH_TEST="publish_ddl"
+
+	CLONE_TABLE="clone_table"
+	
+	SAFE_TABLE_COPY="safe_copy"
+	SPOOL_QUERY="spool_query_data"
+	COPY_QUERY="copy_query_data"
+    />
+
+  <connector>
+		<!--source connector-->
+	<prod client_type="ORACLE" descr="SMART prod db">
+		<AB_SMARTP1B type1='inline' schema="KB50087" pword="hnl123" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<AB_SMARTP_B type1='inline' schema="AB95022" pword="citi500" sid="SMARTP_B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<BK_SMARTP1B type1='inline' schema="RN48751" pword="pwprod1234" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<BI_SMARTQ1 type1='inline' schema="CSMARTBI" pword="Summer25" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<ST_SMARTP1B type1='inline' schema="ST60608" pword="STjun2013" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<SB_SMARTP1B type1='inline' schema="SB90023" pword="Sunny123" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>	
+		<AB_GMAD1 type1='inline' schema="AB95022" pword="Summer102" sid="GMAD1" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<BR_SMARTP1B type1='inline' schema="BR39337" pword="aprpwd13" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<AD_SMARTC1B type1='inline' schema="AD45676" pword="India2211" sid="SMARTC1B" HOST = "mapswdbcn2-vip.nam.nsroot.net"  PORT = "11150"/>
+	</prod>
+	<OPENTRADE_qa client_type="ORACLE" descr="OPENTRADE QA db">
+		<!--  OPENTRADE CONNECTIONS -->
+		<KN_SMARTP1B type1='inline' schema="KN39284" pword="may123" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<COTD_SMARTQ1 type1='inline' schema="CSMARTOTD" pword="Q8EUl3" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<BI_SMARTQ1 type1='inline' schema="CSMARTBI" pword="Summer25" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<COTD_SMARTU1B type1='inline' schema="CSMARTOTD" pword="w7FbQS" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<CIRI_SMARTQ1 type1='inline' schema="CSMARTIRIS" pword="Floren32" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+	</OPENTRADE_qa>
+		<!-- FAILS 2 MO copy -->
+	<Fails_dev client_type="ORACLE" descr="OPENTRADE QA db">
+		<CSMARTBSER_SMARTU1B type1='inline' schema="CSMARTBSER" pword="Mrzorg28" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTBSER_SMARTQ1 type1='inline' schema="CSMARTBSER" pword="Spring16" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTBSER_SMARTD1 type1='inline' schema="CSMARTBSER" pword="Tetris25" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+
+		<EVOL_SMARTD1 type1='inline' schema="Esmartvol " pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<EVOL_SMARTU1B type1='inline' schema="Esmartvol " pword="Kecske57" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<EVOL_SMARTQ1 type1='inline' schema="Esmartvol " pword="Kecske65" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+
+		<CVOL_SMARTU1B type1='inline' schema="CSMARTVOL" pword="Paplan19" sid="SMARTU1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CVOL_SMARTD1 type1='inline' schema="CSMARTVOL" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CVOL_SMARTQ1 type1='inline' schema="CSMARTVOL" pword="Tetris25" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CIRIS_SMARTQ1 type1='inline' schema="CSMARTIRIS" pword="Floren32" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+
+
+		<!--target connectors-->
+		<ESMARTREF_SMARTU1B type1='inline' schema="ESMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTREF_SMARTU1B type1='inline' schema="CSMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTREF_SMARTD1 type1='inline' schema="CSMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<ESMARTREF_SMARTD1 type1='inline' schema="ESMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTREF_SMARTQ1 type1='inline' schema="CSMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<ESMARTREF_SMARTQ1 type1='inline' schema="ESMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+	</Fails_dev>
+  </connector>
+ 
+  <default>
+	  <env>
+		 <safe_copy SAFE_TABLE_COPY="%SAFE_TABLE_COPY%" >
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		 </safe_copy>
+		 
+		 <clone_table CLONE_TABLE="%CLONE_TABLE%" >
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		 </clone_table>
+
+		 <dev 	COPY_METHOD="%SQL_LOADER_COPY%" 
+				SPOOL_METHOD="%SPOOL_TEST%"
+				QUERY_SPOOL_METHOD="%SPOOL_QUERY%"
+				CLONE_TABLE="%CLONE_TABLE%"
+				DML_METHOD="%DML%"
+				QUERY_COPY_METHOD="%COPY_QUERY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dev>
+
+		 
+		 <spool_ddl DDL_SPOOL_METHOD="%DDL_SPOOL_TEST%"
+					PUBLISH_DDL="%DDL_PUBLISH_TEST%"
+					DML_METHOD="%DML%"
+					SELECT_METHOD="%SELECT%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		 </spool_ddl>
+		 
+		 <spool SPOOL_METHOD="%SPOOL_TEST%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		 </spool>
+		 
+		 <select SELECT_METHOD="%SELECT%" COPY_METHOD="%SQL_LOADER_COPY%">  
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </select>	  
+		 <fail_2m COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%FAILS_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </fail_2m>	
+		 
+		 <fails_luly COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </fails_luly>			 
+		 
+		 <dq_test DQ_TEST_METHOD="%DQ_EXPLAIN%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dq_test>
+		 
+		 
+		 <dev_copy COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+ 
+		 </dev_copy>
+
+		 <qa COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>	  
+		 </qa>
+
+		 <uat COPY_METHOD="%FAST_COPY_METHOD%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>	  
+		 </uat>		 
+		 
+		 <prod COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </prod>	 
+	  </env>
+  </default>
+  <worker>
+    <!--worker name has to be unique -->
+	<exec_dml1 name="sqlp" module_name="sql_utils" />	
+    <!--worker name has to be unique -->
+	<exec_copy1 name="sqlp" module_name="sql_utils" />
+		
+	<exec_sharded_copy name="sqlp" module_name="sql_utils" />
+	<exec_spool_ddl name="sqlp" module_name="sql_utils" />
+	<publisher name="sqlp" module_name="sql_utils" />
+	<exec_select1 name="sqlp" module_name="sql_utils" />	
+	<exec_clone_table name="table_utils" module_name="table_utils" />	
+	<exec_safe_copy name="table_utils" module_name="table_utils" />	
+	<exec_dml name="table_utils" module_name="table_utils" />	
+	<exec_copy name="table_utils" module_name="table_utils" />
+	<exec_select name="table_utils" module_name="table_utils" />
+	<exec_spool name="table_utils" module_name="table_utils" />
+	<exec_query_spool name="table_utils" module_name="table_utils" />
+	<exec_query_copy name="table_utils" module_name="table_utils" />
+	
+  </worker>
+</app_spec>

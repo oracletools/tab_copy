@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    env='spool'
+	env2='{$ETL_ENV}'
+    LOG_ROOT="log/"
+	TMPDIR="tmp/"
+	REFS_PATH="refs"
+	binaries_path ="lib"
+	template_path ="lib/template"
+	test_home ="test/"
+	DEV_EMAIL_TO="alex.buzunov@citi.com"
+	EMAIL_TO="alex.buzunov@citi.com"
+	SPOOL_TEST="spool"
+	ADJUSTED_TO_NESTED_SET="adj2nested"
+	SQL_LOADER_COPY="sql_echo_loader"
+	FAST_COPY_METHOD="sql_plus_copy"
+	SELECT ="select"
+	LOAD_TO_DB ="file2db"	
+	PA_DML_TEST="psql_dml"	
+    />
+  <connector>
+	<!--source connector-->
+	<prod client_type="ORACLE" descr="GMA prod database">
+		<AB95022_SMARTD1 type1='inline' schema="AB95022" pword="Summer102" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<AB95022_SMARTP1B type1='inline' schema="AB95022" pword="Summer104" sid="SMARTP1B" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<AB_SMARTP1B type1='inline' schema="AB95022" pword="Apr2012" sid="SMARTP1B" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<AB_GMAD1 type1='inline' schema="AB95022" pword="Mar2012" sid="GMAD1" HOST = "mapmwdbpn2-vip.nam.nsroot.net"  PORT = "11150"/>			
+		<DQSMART_SMARTD1 type1='inline' schema="DQSMART" pword="Y5hSe7n1" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+	</prod>
+	<uat client_type="ORACLE" descr="GMA UAT database">
+		<DLR_SMARTD1 type1='inline' schema="DLROGMARWSMART" pword="Nascar22" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<!--BASEL/CVA-->
+		<AB95022_GMAU1A type1='inline' schema="AB95022" pword="Summer102" sid="GMAU1A" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+
+		<AB95022_GMAP1A type1='inline' schema="AB95022" pword="Summer102" sid="GMAP1A" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+
+		<AB95022_GMAD1 type1='inline' schema="AB95022" pword="Summer102" sid="GMAD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/> 
+		<AB95022_LAB type='scp' user="AB95022" pword="welcome" HOST="168.109.7.14"  PORT="" home ="/home/ab95022/incoming" />
+	</uat>
+	<dev client_type="ORACLE" descr="GMA DEV database">
+	<!--tab_copy connectors-->
+		<ESMARTREF_SMARTU1B type1='inline' schema="ESMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTREF_SMARTU1B type1='inline' schema="CSMARTREF" pword="Kashmir1" sid="SMARTU1B" HOST = "mapswdbun2-vip.nam.nsroot.net"  PORT = "11150"/>	
+		<CSMARTREF_SMARTD1 type1='inline' schema="CSMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<ESMARTREF_SMARTD1 type1='inline' schema="ESMARTREF" pword="spring16" sid="SMARTD1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<CSMARTREF_SMARTQ1 type1='inline' schema="CSMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+		<ESMARTREF_SMARTQ1 type1='inline' schema="ESMARTREF" pword="Jan11uar" sid="SMARTQ1" HOST = "mapswdbdn1.nam.nsroot.net"  PORT = "11150"/>
+	</dev>
+	<!--PADB connectors-->
+	<dev_lab client_type="PARACCEL" descr="Citi lap ParAccel db">
+		<PA_CITI  schema="paraccel" pword="" sid="citi" HOST = "lab7-padb"  PORT = ""/>
+	</dev_lab>
+  </connector> 
+  <default>
+	  <env>
+		 <prod SPOOL_METHOD="%SPOOL_TEST%">
+		  <param name="EMAIL_TO" value='%EMAIL_TO%'></param>
+		 </prod>	  
+		 <spool SPOOL_METHOD="%SPOOL_TEST%" SELECT_METHOD="%SELECT%" PUBLISHER_METHOD="%LOAD_TO_DB%"
+				COPY_METHOD="%SQL_LOADER_COPY%"
+				TRANSFORM_METHOD="%ADJUSTED_TO_NESTED_SET%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB_SMARTP1B%"></param>
+		 </spool>
+		 <!--   FAST_COPY_METHOD / SQL_LOADER_COPY -->
+		 <tab_copy COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB95022_SMARTP1B%"></param>
+		 </tab_copy>
+		 <tab_copy_obj COPY_METHOD="%SQL_LOADER_COPY%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="FROM_DB" value="%AB95022_GMAP1A%"></param>
+		 </tab_copy_obj>
+		 
+		 <!--PADB env config -->
+		 <padb TEST_METHOD="%PA_DML_TEST%">
+		  <param name="EMAIL_TO" value='%DEV_EMAIL_TO%'></param>
+		  <param name="DB_CONNECTOR" value="%PA_CITI%"></param>
+ 		  <param name="PROJECT_NAME" value='PADB'></param>
+
+		 </padb>
+		 
+	  </env>
+  </default>
+  <worker>
+    <!--worker name has to be unique -->
+	<exec_copy name="sqlp" module_name="sql_utils" />
+	<exec_dml name="sqlp" module_name="sql_utils" />
+	<exec_ddl name="sqlp" module_name="sql_utils" />	
+	<exec_select name="sqlp" module_name="sql_utils" />
+	<exec_spool name="sqlp" module_name="sql_utils" />	
+	<db_publisher name="sqlp" module_name="sql_utils" />	
+	<publisher_scp name="scp" module_name="pub_utils" />
+	<!--PADB worker types -->
+	<exec_pa_dml name="psql" module_name="pa_sql_utils" />
+	<!--transformer types -->
+	<nested_set_transformer name="hierarchy" module_name="hier_utils" />	
+	
+  </worker>
+</app_spec>

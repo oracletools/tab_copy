@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<etldataflow name="SHARDED_TABLE_COPY_CSMARTVOL.DEL_BUS_DT" node_type="etldataflow" pipeline_config="pipeline_config_150118_113607.xml">
+  <globals>
+    <param name="FLOW_TYPE" node_type="param" value="SYNC"/>
+    <param name="FIELD_TERMINATOR" node_type="param" value="|"/>
+    <param name="LINE_TERMINATOR" node_type="param" value="~"/>
+    <param name="FROM_DB" node_type="param" value="CSMARTVOL_SMARTQ1"/>
+    <param name="TO_DB" node_type="param" value="CSMARTVOL_SMARTQ1"/>
+    <param name="LAME_DUCK" node_type="param" value="0"/>
+    <param name="ARRAYSIZE" node_type="param" value="100000"/>
+    <param name="COPYCOMMIT" node_type="param" value="4"/>
+    <param name="SKIP_INDEX_MAINTENANCE" node_type="param" value="TRUE"/>
+    <param name="DPL_BINDSIZE" node_type="param" value="100000"/>
+    <param name="IF_REBUILD_UNUSABLE_INDEXES" node_type="param" value="0"/>
+    <param name="IF_SHOW_SERVEROUTPUT" node_type="param" value="1"/>
+  </globals>
+  <worker name="CSMARTVOL.DEL_BUS_DT" node_type="worker">
+    <exec_select>
+      <table_utils method="%DML_METHOD%">
+        <param name="DB_CONNECTOR" node_type="param" value="%CSMARTVOL_SMARTQ1%"/>
+        <param name="SCHEMA_NAME" node_type="param" value="CSMARTVOL"/>
+        <param name="TABLE_NAME" node_type="param" value="DEL_BUS_DT"/>
+      </table_utils>
+    </exec_select>
+    <exec_select>
+      <table_utils method="%DML_METHOD%">
+        <param name="DB_CONNECTOR" node_type="param" value="%CSMARTVOL_SMARTQ1%"/>
+        <param name="SCHEMA_NAME" node_type="param" value="CSMARTVOL"/>
+        <param name="TABLE_NAME" node_type="param" value="DEL_BUS_DT"/>
+      </table_utils>
+    </exec_select>
+    <exec_copy>
+      <sqlp method="%COPY_METHOD%">
+        <param name="IF_TRUNCATE" node_type="param" value="0"/>
+        <param name="NUM_OF_SHARDS" node_type="param" value="6"/>
+        <param name="IF_DPL_SERIAL" node_type="param" value="0"/>
+        <param name="TO_SCHEMA" node_type="param" value="CSMARTVOL"/>
+        <param name="TO_TABLE" node_type="param" value="DEL_BUS_DT"/>
+      </sqlp>
+    </exec_copy>
+    <exec_select>
+      <table_utils method="%DML_METHOD%">
+        <param name="DB_CONNECTOR" node_type="param" value="%CSMARTVOL_SMARTQ1%"/>
+        <param name="SCHEMA_NAME" node_type="param" value="CSMARTVOL"/>
+        <param name="TABLE_NAME" node_type="param" value="DEL_BUS_DT"/>
+        <param name="STATS_METHOD_OPT" node_type="param" value="FOR ALL COLUMNS"/>
+        <param name="STATS_GRANULARITY" node_type="param" value="AUTO"/>
+        <param name="STATS_DEGREE" node_type="param" value="16"/>
+        <param name="STATS_CASCADE" node_type="param" value="TRUE"/>
+      </table_utils>
+    </exec_select>
+  </worker>
+</etldataflow>

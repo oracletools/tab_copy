@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<app_spec>
+  <process_spec
+    LOG_ROOT="log/"
+    LOAD_ROOT="load/"
+	APPLOG_ROOT="logs/applog/"
+	SYSLOG_ROOT="logs/syslog/"
+	CODELOG_ROOT="logs/codelog/"
+	REFS_PATH="refs"
+	binaries_path ="lib/"
+    />
+  <connector>
+   <GMA_DEV  client_type="ORACLE" descr="GMA DEV database">
+		<CUSER_GMAD schema="C160970GMA" pword="citibank1$" sid="GMAD" />
+		<CPEARL_GMAD schema="C160970GMAPRL" pword="citibank1$" sid="GMAD" />
+		<JUSER_QA schema="J160970GMA" pword="citibank1$" sid="GMAQA" />
+		<MDW_MDWD schema="MDW" pword="citibank" sid="MDWD" />	
+   </GMA_DEV>
+  </connector>
+  <default>
+    log_dest="LOG_ROOT"	
+  </default>
+  <worker>
+    <copy name="sql_plus_copy" module_name="sql_utils" />
+    <copy name="sp_data_copy" module_name="sql_utils" />
+    <copy name="mist" module_name="sql_utils" />
+  </worker>
+</app_spec>

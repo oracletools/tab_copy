@@ -1,0 +1,220 @@
+
+
+
+
+
+
+
+Sign In
+ Deutsch (German)English US (English US)Español (Spanish)Français (French)Nederlands (SF Dutch)Polski (SF Polish)
+ 
+
+Career Opportunities: Sr. Mgr., EDW ETL Architecture, BI Center of Excellence (COE) (23381)
+ 
+
+Req Id 23381 - Posted 04/22/2014 - Finance / IT / HR / Legal - New York - US
+ 
+Job Description Print Preview 
+
+
+Apply Save Job Email Job to Friend Return to List 
+. 
+
+ 
+
+
+
+ 
+
+ 
+
+Equal Employment Opportunities
+ We offer equal employment opportunity to qualified individuals without regard to race, religion, color, national origin, age, gender, 
+disability, sexual orientation, gender identity, gender expression, marital status, veteran status, or any other characteristic protected
+ by law. We strongly believe that cultivating a diverse workplace gives a company strength. The combination of unique skills, abilities,
+ experiences and backgrounds creates an environment that produces extraordinary results. EOE Minorities/Females/Protected Veterans/Disabled. 
+
+English - Please click on this link to review the Notification of Equal Opportunity Rights poster 
+
+Español - Por favor, haga un clic en el enlace para revisar el poster de la Ley de los Derechos de Igualdad de Empeo 
+
+ 
+
+ 
+
+
+
+
+ Title:
+ 
+
+Sr. Mgr., EDW ETL Architecture, BI Center of Excellence (COE)
+ 
+
+
+
+Location:
+ 
+
+New York, NY
+ 
+
+
+
+Reports to:
+ 
+
+Director, BI Solution & Technology Architecture, BI CoE
+ 
+
+POSITION RESPONSIBILITIES
+
+
+
+
+Description
+
+ 
+
+The EDW ETL Architect will have overall responsibility for developing, implementing, enhancing, and evolving the overall Enterprise Data Warehouse (EDW) ETL flows and supporting SQL procedures. In addition, this role will have accountability for documenting and communicating ETL best practices, stored procedure development, naming conventions, and performance tuning. This role will focus on the build of our subject area independent, target state data warehouse, using our standard ETL platform (Informatica), and will leverage our core data modeling and repository tools (Embarcadero). This role will have both oversight and execution responsibility for all aspects of Coty’s target EDW solution ETL architecture, as well as the load performance. Furthermore, this role will have input to and will serve as the SME related to new enhancements, upgrades, and capacity planning related to the ETL platform. This position will assist in sizing/scoping of future projects/enhancements to our EDW solution. In terms of operational responsibilities, this role will define and maintain acceptable ETL design patterns, as well as platform service KPIs. Moreover, this individual will work directly with our internal SAP/ERP basis, database, integration, and help desk teams to address critical incidents, as well as our vendors (both service and software) to improve the stability and performance of our EDW.
+
+ 
+
+Job Function
+
+ 
+
+Financial Management
+Estimate and prioritize ETL platform changes (related to newly sourced data or new transformation logic) and funding requirements to sustain ETL platform health/capability/sustainability
+Manage all ETL vendor resources, as needed
+
+ 
+
+Architecture Management
+Provide EDW ETL domain leadership for Coty
+Serve as key POC for vendor partners related to EDW ETL platform/projects
+Accountable for the performance, health, and stability of all ETL flows and ETL platforms, as well as their evolution (e.g., patch timeline, upgrades, replacements, etc.)
+Accountable for driving the continued performance and stability of new applications within the ETL landscape, including the performance and/or management of EDW ETL workflow/metadata deployment
+Accountable for the specification of the structure, timing, and content of ETL flow reviews required of new applications proposed to participate on the shared EDW ETL platform
+Constantly explore new ways to improve ETL platform and application performance, while reducing total cost of ownership
+
+Technical Development Management
+Actively participate in EDW/BI application designs, and work with project teams to come up with ETL designs optimal for the reporting efficacy/performance
+Guide offshore/onshore development resources with development and/or technical issues with the core EDW ETL platform
+Ensure that promoted ETL flows and/or stored procedures are in keeping with the specified ETL design standards
+
+ 
+
+Vendor Management
+Work directly with vendor personnel (as needed) to ensure appropriate ETL architecture/design/development standards are met
+
+Knowledge Management
+
+ 
+Track lessons learned and share with COE internal/external stakeholders
+Create and govern standards and processes for change management and version control
+Create and maintain EDW ETL solution standards documentation, including architectural documentation, platform run books, acceptable ETL design patterns
+Collect and report ETL platform usage and performance KPIs
+ 
+
+JOB REQUIREMENTS
+
+
+
+
+Education 
+Bachelor's degree in Computer Science, Engineering, Mathematics, or related discipline, or equivalent work experience is required
+ 
+
+
+
+ 
+
+Experience
+At least 10 years of overall experience with data warehouse ETL tools (Informatica) and stored procedure development, with specific expertise on analytic database appliances (Netezza preferred)
+5 years of development experience involving ETL design and PL/SQL development, specifically in a  data warehousing context
+2 years of experience working with SAP ERP (ECC) as a source (preferably involving leveraging Informatica Powerexchange adapters for SAP ECC)
+ 
+
+ 
+
+Key Qualities and Skills
+Proven track record of creating and managing enterprise scale data warehouse ETL development and stored procedures
+Good written and verbal presentation skills
+Ability to anticipate risks and issues, escalate to management, and facilitate decision-making to drive priorities and eliminate waste
+Strong process orientation with significant attention to detail
+Effective interpersonal skills with ability to participate in and lead "virtual" teams
+Knowledge and/or experience with of project management tools a plus (i.e., Microsoft Project, MS Excel, MS Visio, MS Sharepoint, etc.)
+Deep technical skills in EDW and BI technology is required (Netezza HCA, Informatica 10, Oracle 11, SQL Server, and Microstrategy, among others)
+ 
+ 
+
+ 
+
+Equal Employment Opportunities
+ We offer equal employment opportunity to qualified individuals without regard to race, religion, color, national origin, age, gender, 
+disability, sexual orientation, gender identity, gender expression, marital status, veteran status, or any other characteristic protected
+ by law. We strongly believe that cultivating a diverse workplace gives a company strength. The combination of unique skills, abilities,
+ experiences and backgrounds creates an environment that produces extraordinary results. EOE Minorities/Females/Protected Veterans/Disabled. 
+.  
+
+Apply Save Job Email Job to Friend Return to List 
+. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+.
